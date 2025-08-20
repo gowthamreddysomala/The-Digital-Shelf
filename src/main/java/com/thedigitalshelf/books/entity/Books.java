@@ -5,63 +5,153 @@ import jakarta.persistence.*;
 public class Books {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int id;
-    @Column(name ="title" , nullable = false)
+    @Column(name = "title" , nullable = false)
     private String title;
-    @Column(name ="author" , nullable = false)
+    @Column(name ="author" , nullable = true)
     private String author;
+    @Column(name = "publisher" , nullable = true)
+    private String publisher;
+    @Column(name = "published_date")
+    private String publishedDate;
+    @Column(name = "description")
+    private String description;
+    @Column(name = "category")
+    private String category;
+    @Column(name = "image")
+    private String image;
+    @Column(name = "url")
+    private String url;
     @Column(name = "rating")
     private int rating;
-    @Column(name = "description" , nullable = false)
-    private String description;
-    // getters and setters
+    @Column(name = "price")
+    private float price;
+
+    // no-args constructor
+    public Books() {
+
+    }
+    // all-args Constructor except id
+
+    public Books(String title, String author, String publisher, String publishedDate, String description, String category, String image, String url, int rating, float price) {
+        this.title = title;
+        this.author = author;
+        this.publisher = publisher;
+        this.publishedDate = publishedDate;
+        this.description = description;
+        this.category = category;
+        this.image = image;
+        this.url = url;
+        this.rating = rating;
+        this.price = price;
+    }
+
+
+    // getters and Setters
+
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
     }
+
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
+
     public String getAuthor() {
         return author;
     }
+
     public void setAuthor(String author) {
         this.author = author;
     }
-    public int getRating() {
-        return rating;
+
+    public String getPublisher() {
+        return publisher;
     }
-    public void setRating(int rating) {
-        this.rating = rating;
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
     }
+
+    public String getPublishedDate() {
+        return publishedDate;
+    }
+
+    public void setPublishedDate(String publishedDate) {
+        this.publishedDate = publishedDate;
+    }
+
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
-    // no Args Constructor and All args constructor
-    public Books() {
+
+    public String getCategory() {
+        return category;
     }
-    public Books(String title, String author, int rating, String description) {
-        this.title = title;
-        this.author = author;
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
         this.rating = rating;
-        this.description = description;
     }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
     @Override
     public String toString() {
         return "Books{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", author='" + author + '\'' +
-                ", rating=" + rating +
+                ", publisher='" + publisher + '\'' +
+                ", publishedDate='" + publishedDate + '\'' +
                 ", description='" + description + '\'' +
+                ", category='" + category + '\'' +
+                ", image='" + image + '\'' +
+                ", url='" + url + '\'' +
+                ", rating=" + rating +
+                ", price=" + price +
                 '}';
     }
 }
