@@ -1,7 +1,7 @@
 package com.thedigitalshelf.books.entity;
 import jakarta.persistence.*;
 @Entity
-@Table(name = "books")
+@Table(name = "booksdigital")
 public class Books {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
