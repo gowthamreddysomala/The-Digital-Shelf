@@ -7,26 +7,29 @@ public class Books {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-    @Column(name = "title" , nullable = false)
+    @Column(name = "title" , nullable = false, length = 500)
     private String title;
-    @Column(name ="author" , nullable = true)
+    @Column(name ="author" , nullable = true, length = 200)
     private String author;
-    @Column(name = "publisher" , nullable = true)
+    @Column(name = "publisher" , nullable = true, length = 200)
     private String publisher;
-    @Column(name = "published_date")
+    @Column(name = "published_date", length = 50)
     private String publishedDate;
-    @Column(name = "description")
+    @Column(name = "description", length = 2000)
     private String description;
-    @Column(name = "category")
+    @Column(name = "category", length = 100)
     private String category;
-    @Column(name = "image")
+    @Column(name = "image", length = 1000)
     private String image;
-    @Column(name = "url")
+    @Column(name = "url", length = 1000)
     private String url;
     @Column(name = "rating")
     private int rating;
     @Column(name = "price")
     private float price;
+    
+    @Column(name = "featured", nullable = false)
+    private boolean featured = false;
 
     // no-args constructor
     public Books() {
@@ -34,7 +37,7 @@ public class Books {
     }
     // all-args Constructor except id
 
-    public Books(String title, String author, String publisher, String publishedDate, String description, String category, String image, String url, int rating, float price) {
+    public Books(String title, String author, String publisher, String publishedDate, String description, String category, String image, String url, int rating, float price, boolean featured) {
         this.title = title;
         this.author = author;
         this.publisher = publisher;
@@ -45,6 +48,7 @@ public class Books {
         this.url = url;
         this.rating = rating;
         this.price = price;
+        this.featured = featured;
     }
 
 
@@ -138,6 +142,14 @@ public class Books {
         this.price = price;
     }
 
+    public boolean isFeatured() {
+        return featured;
+    }
+
+    public void setFeatured(boolean featured) {
+        this.featured = featured;
+    }
+
     @Override
     public String toString() {
         return "Books{" +
@@ -152,6 +164,7 @@ public class Books {
                 ", url='" + url + '\'' +
                 ", rating=" + rating +
                 ", price=" + price +
+                ", featured=" + featured +
                 '}';
     }
 }
