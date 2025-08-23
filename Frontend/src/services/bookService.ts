@@ -1,6 +1,6 @@
 import { Book, PaginatedResponse, SearchParams } from '../types'
 
-const API_BASE_URL = 'http://localhost:8080/api'
+const API_BASE_URL = 'https://the-digital-shelf.onrender.com/api'
 const FALLBACK_IMAGE = '/fallback/book-cover.svg'
 
 // Helper function to get auth headers

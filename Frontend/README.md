@@ -193,7 +193,7 @@ For support or questions, please open an issue in the repository or contact the 
 
 ---
 
-Built with ❤️ using modern web technologies
+Built by Gowtham Reddy
 
 
 
