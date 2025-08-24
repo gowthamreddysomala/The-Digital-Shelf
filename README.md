@@ -588,7 +588,7 @@ We welcome contributions to the Digital Shelf project! Here's how you can help:
 
 ---
 
-**Built with ❤️ by [Gowtham Reddy](https://github.com/gowthamreddysomala)**
+**Built by [Gowtham Reddy](https://github.com/gowthamreddysomala)**
 
 *Spring Boot enthusiast | JPA & Database Schema Design | Backend Development | Clean Code Advocate*
 
