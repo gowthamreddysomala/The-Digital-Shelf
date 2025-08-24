@@ -1,12 +1,14 @@
 import {Link, useParams} from 'react-router-dom'
 import {useQuery} from 'react-query'
 import {motion} from 'framer-motion'
-import {ArrowLeft, BookOpen, Calendar, Globe, Heart, Share2, ShoppingCart, Star, User, Download} from 'lucide-react'
+import {ArrowLeft, BookOpen, Calendar, Globe, Share2, Star, User, Download, Check} from 'lucide-react'
 import {bookService} from '../services/bookService'
 import BookCard from '../components/BookCard'
+import {useState} from 'react'
 
 const BookDetailPage = () => {
   const { id } = useParams<{ id: string }>()
+  const [showCopied, setShowCopied] = useState(false)
 
   const { data: book, isLoading, error } = useQuery(
     ['book', id],
@@ -23,6 +25,29 @@ const BookDetailPage = () => {
       enabled: !!book?.genre?.length
     }
   )
+
+  const handleShare = async () => {
+    if (book) {
+      const bookUrl = window.location.href
+      
+      try {
+        await navigator.clipboard.writeText(bookUrl)
+        setShowCopied(true)
+        setTimeout(() => setShowCopied(false), 2000)
+      } catch (err) {
+        console.error('Failed to copy to clipboard:', err)
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea')
+        textArea.value = bookUrl
+        document.body.appendChild(textArea)
+        textArea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textArea)
+        setShowCopied(true)
+        setTimeout(() => setShowCopied(false), 2000)
+      }
+    }
+  }
 
   const renderStars = (rating: number) => {
     const stars = []
@@ -189,31 +214,30 @@ const BookDetailPage = () => {
                 <Download className="h-5 w-5" />
                 <span>Download</span>
               </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                disabled={!book.inStock}
-                className="btn-secondary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ShoppingCart className="h-5 w-5" />
-                <span>{book.inStock ? 'Add to Cart' : 'Out of Stock'}</span>
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="btn-secondary flex items-center space-x-2"
-              >
-                <Heart className="h-5 w-5" />
-                <span>Wishlist</span>
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="btn-secondary flex items-center space-x-2"
-              >
-                <Share2 className="h-5 w-5" />
-                <span>Share</span>
-              </motion.button>
+              <div className="relative">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="btn-secondary flex items-center space-x-2"
+                  onClick={handleShare}
+                >
+                  <Share2 className="h-5 w-5" />
+                  <span>Share</span>
+                </motion.button>
+                
+                {/* Copy Success Popup */}
+                {showCopied && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.9 }}
+                    className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gruvbox-light-green dark:bg-gruvbox-dark-green text-gruvbox-light-bg0 dark:text-gruvbox-dark-bg0 rounded-lg text-sm font-medium shadow-lg z-10 flex items-center space-x-2"
+                  >
+                    <Check className="h-4 w-4" />
+                    <span>URL copied to clipboard!</span>
+                  </motion.div>
+                )}
+              </div>
             </div>
           </div>
 

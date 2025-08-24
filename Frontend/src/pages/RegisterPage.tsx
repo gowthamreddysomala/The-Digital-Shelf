@@ -13,7 +13,6 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
@@ -26,7 +25,6 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!agreedToTerms) return
     
     setIsLoading(true)
     
@@ -178,58 +176,16 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            <div className="flex items-start space-x-3">
-              <input
-                type="checkbox"
-                checked={agreedToTerms}
-                onChange={(e) => setAgreedToTerms(e.target.checked)}
-                className="mt-1 rounded border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 bg-gruvbox-light-bg0/60 dark:bg-gruvbox-dark-bg0/60 text-gruvbox-light-primary dark:text-gruvbox-dark-primary focus:ring-gruvbox-light-primary dark:focus:ring-gruvbox-dark-primary"
-              />
-              <label className="text-sm text-gruvbox-light-fg2 dark:text-gruvbox-dark-fg2">
-                I agree to the{' '}
-                <Link
-                  to="/terms"
-                  className="text-gruvbox-light-primary dark:text-gruvbox-dark-primary hover:text-gruvbox-light-primary/80 dark:hover:text-gruvbox-dark-primary/80"
-                >
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link
-                  to="/privacy"
-                  className="text-gruvbox-light-primary dark:text-gruvbox-dark-primary hover:text-gruvbox-light-primary/80 dark:hover:text-gruvbox-dark-primary/80"
-                >
-                  Privacy Policy
-                </Link>
-              </label>
-            </div>
-
             <motion.button
               type="submit"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              disabled={isLoading || !agreedToTerms || !isPasswordValid || !doPasswordsMatch}
+              disabled={isLoading || !isPasswordValid || !doPasswordsMatch}
               className="w-full py-3 bg-gruvbox-light-primary/90 dark:bg-gruvbox-dark-primary/90 backdrop-blur-sm hover:bg-gruvbox-light-primary dark:hover:bg-gruvbox-dark-primary text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-black/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Creating account...' : 'Create Account'}
             </motion.button>
           </form>
-
-          {/* Divider */}
-          <div className="my-6 flex items-center">
-            <div className="flex-1 border-t border-gruvbox-light-bg3/20 dark:border-gruvbox-dark-bg3/20"></div>
-            <span className="px-4 text-sm text-gruvbox-light-fg3 dark:text-gruvbox-dark-fg3">or</span>
-            <div className="flex-1 border-t border-gruvbox-light-bg3/20 dark:border-gruvbox-dark-bg3/20"></div>
-          </div>
-
-          {/* Social Register */}
-          <div className="space-y-3">
-            <button className="w-full py-3 bg-gruvbox-light-bg0/60 dark:bg-gruvbox-dark-bg0/60 backdrop-blur-md hover:bg-gruvbox-light-bg0/80 dark:hover:bg-gruvbox-dark-bg0/80 border border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 text-gruvbox-light-fg dark:text-gruvbox-dark-fg font-medium rounded-xl transition-all duration-200 shadow-lg shadow-black/10">
-              Continue with Google
-            </button>
-            <button className="w-full py-3 bg-gruvbox-light-bg0/60 dark:bg-gruvbox-dark-bg0/60 backdrop-blur-md hover:bg-gruvbox-light-bg0/80 dark:hover:bg-gruvbox-dark-bg0/80 border border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 text-gruvbox-light-fg dark:text-gruvbox-dark-fg font-medium rounded-xl transition-all duration-200 shadow-lg shadow-black/10">
-              Continue with GitHub
-            </button>
-          </div>
 
           {/* Sign In Link */}
           <div className="text-center mt-6">

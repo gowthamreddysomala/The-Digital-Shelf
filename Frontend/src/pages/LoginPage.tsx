@@ -174,23 +174,6 @@ const LoginPage = () => {
             </motion.button>
           </form>
 
-          {/* Divider */}
-          <div className="my-6 flex items-center">
-            <div className="flex-1 border-t border-gruvbox-light-bg3/20 dark:border-gruvbox-dark-bg3/20"></div>
-            <span className="px-4 text-sm text-gruvbox-light-fg3 dark:text-gruvbox-dark-fg3">or</span>
-            <div className="flex-1 border-t border-gruvbox-light-bg3/20 dark:border-gruvbox-dark-bg3/20"></div>
-          </div>
-
-          {/* Social Login */}
-          <div className="space-y-3">
-            <button className="w-full py-3 bg-gruvbox-light-bg0/60 dark:bg-gruvbox-dark-bg0/60 backdrop-blur-md hover:bg-gruvbox-light-bg0/80 dark:hover:bg-gruvbox-dark-bg0/80 border border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 text-gruvbox-light-fg dark:text-gruvbox-dark-fg font-medium rounded-xl transition-all duration-200 shadow-lg shadow-black/10">
-              Continue with Google
-            </button>
-            <button className="w-full py-3 bg-gruvbox-light-bg0/60 dark:bg-gruvbox-dark-bg0/60 backdrop-blur-md hover:bg-gruvbox-light-bg0/80 dark:hover:bg-gruvbox-dark-bg0/80 border border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 text-gruvbox-light-fg dark:text-gruvbox-dark-fg font-medium rounded-xl transition-all duration-200 shadow-lg shadow-black/10">
-              Continue with GitHub
-            </button>
-          </div>
-
           {/* Sign Up Link */}
           <div className="text-center mt-6">
             <span className="text-gruvbox-light-fg2 dark:text-gruvbox-dark-fg2">
