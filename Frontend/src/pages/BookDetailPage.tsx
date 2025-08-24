@@ -71,6 +71,23 @@ const BookDetailPage = () => {
   }
 
   if (error || !book) {
+    // Check if it's an authentication error
+    if (error instanceof Error && error.message.includes('Authentication required')) {
+      return (
+        <div className="text-center py-12">
+          <div className="text-gray-400 text-lg mb-4">Please login to access the book</div>
+          <div className="space-x-4">
+            <Link to="/login" className="btn-primary">
+              Login
+            </Link>
+            <Link to="/" className="btn-secondary">
+              Back to Home
+            </Link>
+          </div>
+        </div>
+      )
+    }
+    
     return (
       <div className="text-center py-12">
         <div className="text-gray-400 text-lg mb-4">Book not found</div>
@@ -161,6 +178,13 @@ const BookDetailPage = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="btn-primary flex items-center space-x-2"
+                onClick={() => {
+                  if (book.url && book.url.trim() !== '') {
+                    window.open(book.url, '_blank')
+                  } else {
+                    alert('Download link not available for this book')
+                  }
+                }}
               >
                 <Download className="h-5 w-5" />
                 <span>Download</span>

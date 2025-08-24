@@ -14,6 +14,7 @@ export interface Book {
   publisher: string
   inStock: boolean
   featured: boolean
+  url: string
 }
 
 export interface SearchFilters {

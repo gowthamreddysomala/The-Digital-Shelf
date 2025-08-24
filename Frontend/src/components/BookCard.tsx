@@ -1,7 +1,8 @@
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import {motion} from 'framer-motion'
 import {Eye, ShoppingCart, Star, Download} from 'lucide-react'
 import {Book} from '../types'
+import {useAuth} from '../contexts/AuthContext'
 
 interface BookCardProps {
   book: Book
@@ -9,6 +10,18 @@ interface BookCardProps {
 }
 
 const BookCard = ({ book, index = 0 }: BookCardProps) => {
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+
+  const handleBookClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault()
+      navigate('/login')
+      return
+    }
+    // If authenticated, let the Link handle navigation normally
+  }
+
   const renderStars = (rating: number) => {
     const stars = []
     const fullStars = Math.floor(rating)
@@ -44,7 +57,7 @@ const BookCard = ({ book, index = 0 }: BookCardProps) => {
       whileHover={{ y: -8 }}
       className="group relative overflow-hidden rounded-2xl bg-gruvbox-light-bg0/30 dark:bg-gruvbox-dark-bg0/30 backdrop-blur-2xl border border-gruvbox-light-bg3/20 dark:border-gruvbox-dark-bg3/20 shadow-2xl shadow-black/20 hover:shadow-3xl hover:shadow-black/30 transition-all duration-300 cursor-pointer p-4"
     >
-      <Link to={`/book/${book.id}`}>
+      <Link to={`/book/${book.id}`} onClick={handleBookClick}>
         {/* Book Cover */}
         <div className="relative mb-4 overflow-hidden rounded-xl">
           <div className="aspect-[18/27] w-full">
@@ -71,7 +84,14 @@ const BookCard = ({ book, index = 0 }: BookCardProps) => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 className="p-2 bg-gruvbox-light-green/90 dark:bg-gruvbox-dark-green/90 backdrop-blur-xl rounded-full text-white hover:bg-gruvbox-light-green dark:hover:bg-gruvbox-dark-green transition-colors duration-200 shadow-2xl"
-                onClick={(e) => e.preventDefault()}
+                onClick={(e) => {
+                  e.preventDefault()
+                  if (book.url && book.url.trim() !== '') {
+                    window.open(book.url, '_blank')
+                  } else {
+                    alert('Download link not available for this book')
+                  }
+                }}
               >
                 <Download className="h-4 w-4" />
               </motion.button>

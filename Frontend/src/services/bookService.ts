@@ -71,7 +71,8 @@ export const bookService = {
         language: 'English',
         publisher: book.publisher || '',
         inStock: true,
-        featured: book.featured || false
+        featured: book.featured || false,
+        url: book.url || ''
       }))
       
       return {
@@ -117,7 +118,8 @@ export const bookService = {
         language: 'English',
         publisher: book.publisher || '',
         inStock: true,
-        featured: book.featured || false
+        featured: book.featured || false,
+        url: book.url || ''
       }))
     } catch (error) {
       console.error('Error fetching featured books:', error)
@@ -159,7 +161,8 @@ export const bookService = {
         language: 'English',
         publisher: book.publisher || '',
         inStock: true,
-        featured: book.featured || false
+        featured: book.featured || false,
+        url: book.url || ''
       }
     } catch (error) {
       console.error('Error fetching book:', error)
@@ -197,7 +200,8 @@ export const bookService = {
         language: 'English',
         publisher: book.publisher || '',
         inStock: true,
-        featured: book.featured || false
+        featured: book.featured || false,
+        url: book.url || ''
       }))
     } catch (error) {
       console.error('Error searching books:', error)
@@ -240,7 +244,8 @@ export const bookService = {
         language: 'English',
         publisher: book.publisher || '',
         inStock: true,
-        featured: book.featured || false
+        featured: book.featured || false,
+        url: book.url || ''
       }))
     } catch (error) {
       console.error('Error fetching books by genre:', error)
@@ -279,7 +284,8 @@ export const bookService = {
         language: 'English',
         publisher: book.publisher || '',
         inStock: true,
-        featured: book.featured || false
+        featured: book.featured || false,
+        url: book.url || ''
       }
     } catch (error) {
       console.error('Error creating book:', error)
@@ -318,7 +324,8 @@ export const bookService = {
         language: 'English',
         publisher: book.publisher || '',
         inStock: true,
-        featured: book.featured || false
+        featured: book.featured || false,
+        url: book.url || ''
       }
     } catch (error) {
       console.error('Error updating book:', error)
