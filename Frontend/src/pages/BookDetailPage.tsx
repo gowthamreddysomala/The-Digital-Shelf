@@ -28,7 +28,7 @@ const BookDetailPage = () => {
 
   const handleShare = async () => {
     if (book) {
-      const bookUrl = window.location.href
+      const bookUrl = "https://digitalshelf.netlify.app"
       
       try {
         await navigator.clipboard.writeText(bookUrl)
@@ -234,7 +234,7 @@ const BookDetailPage = () => {
                     className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gruvbox-light-green dark:bg-gruvbox-dark-green text-gruvbox-light-bg0 dark:text-gruvbox-dark-bg0 rounded-lg text-sm font-medium shadow-lg z-10 flex items-center space-x-2"
                   >
                     <Check className="h-4 w-4" />
-                    <span>URL copied to clipboard!</span>
+                    <span>URL copied to your clipboard!</span>
                   </motion.div>
                 )}
               </div>
