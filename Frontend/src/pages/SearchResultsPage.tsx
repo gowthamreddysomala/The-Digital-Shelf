@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useCallback} from 'react'
 import {useQuery} from 'react-query'
 import {useSearchParams} from 'react-router-dom'
 import {motion} from 'framer-motion'
@@ -15,9 +15,19 @@ const SearchResultsPage = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [currentPage, setCurrentPage] = useState(1)
+  const [debouncedQuery, setDebouncedQuery] = useState('')
 
   const query = searchParams.get('q') || ''
   const genreFilter = searchParams.get('genre') || ''
+
+  // Debounce search query for better performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery)
+    }, 300) // 300ms delay
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   useEffect(() => {
     setSearchQuery(query)
@@ -26,18 +36,98 @@ const SearchResultsPage = () => {
     }
   }, [query, genreFilter])
 
-  const { data: searchResults, isLoading } = useQuery(
-    ['search', query, filters, currentPage],
-    () => bookService.getBooks({
-      query,
-      filters,
-      page: currentPage,
-      limit: 12
-    }),
+  // Set default sort for rating to show highest first
+  useEffect(() => {
+    if (sortBy === 'rating') {
+      setSortOrder('desc')
+    }
+  }, [sortBy])
+
+  // Apply filters and search to the data
+  const { data: allBooks, isLoading } = useQuery(
+    ['books'],
+    () => bookService.getBooks({ limit: 1000 }), // Get a large number of books for local filtering
     {
       keepPreviousData: true
     }
   )
+
+  // Filter and search books locally
+  const filteredBooks = allBooks?.data?.filter((book: Book) => {
+    // Search query filter - use debounced query for better performance
+    if (debouncedQuery && !book.title.toLowerCase().includes(debouncedQuery.toLowerCase()) && 
+        !book.author.toLowerCase().includes(debouncedQuery.toLowerCase()) &&
+        !book.description.toLowerCase().includes(debouncedQuery.toLowerCase()) &&
+        !book.genre.some(g => g.toLowerCase().includes(debouncedQuery.toLowerCase()))) {
+      return false
+    }
+
+    // Genre filter
+    if (filters.genre) {
+      if (filters.genre === 'fiction') {
+        // Fiction filter - return only fiction books
+        if (!book.genre.some(g => 
+          ['fiction', 'fantasy', 'romance', 'adventure', 'mystery', 'thriller', 'sci-fi', 'dystopian'].includes(g.toLowerCase())
+        )) {
+          return false
+        }
+      } else if (filters.genre === 'non-fiction') {
+        // Non-fiction filter - return all non-fiction books
+        if (book.genre.some(g => 
+          ['fiction', 'fantasy', 'romance', 'adventure', 'mystery', 'thriller', 'sci-fi', 'dystopian'].includes(g.toLowerCase())
+        )) {
+          return false
+        }
+      } else {
+        // Specific genre filter
+        if (!book.genre.some(g => g.toLowerCase().includes(filters.genre!.toLowerCase()))) {
+          return false
+        }
+      }
+    }
+
+    // Rating filter
+    if (filters.rating && book.rating < filters.rating) {
+      return false
+    }
+
+    // Stock filter
+    if (filters.inStock && !book.inStock) {
+      return false
+    }
+
+    return true
+  }) || []
+
+  // Sort books
+  const sortedBooks = [...filteredBooks].sort((a, b) => {
+    let aValue: any = a[sortBy as keyof Book]
+    let bValue: any = b[sortBy as keyof Book]
+
+    // Handle string sorting
+    if (typeof aValue === 'string') {
+      aValue = aValue.toLowerCase()
+      bValue = bValue.toLowerCase()
+    }
+
+    // For rating, always sort descending (highest first)
+    if (sortBy === 'rating') {
+      if (aValue > bValue) return -1
+      if (aValue < bValue) return 1
+      return 0
+    }
+
+    // For other fields, use the selected sort order
+    if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1
+    if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1
+    return 0
+  })
+
+  // Pagination
+  const booksPerPage = 12
+  const totalPages = Math.ceil(sortedBooks.length / booksPerPage)
+  const startIndex = (currentPage - 1) * booksPerPage
+  const paginatedBooks = sortedBooks.slice(startIndex, startIndex + booksPerPage)
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,6 +136,14 @@ const SearchResultsPage = () => {
       setCurrentPage(1)
     }
   }
+
+  // Update search params when debounced query changes
+  useEffect(() => {
+    if (debouncedQuery !== query) {
+      setSearchParams({ q: debouncedQuery })
+      setCurrentPage(1)
+    }
+  }, [debouncedQuery, query, setSearchParams])
 
   const handleFilterChange = (newFilters: Partial<SearchFilters>) => {
     const updatedFilters = { ...filters, ...newFilters }
@@ -67,8 +165,6 @@ const SearchResultsPage = () => {
     setCurrentPage(1)
   }
 
-  const totalPages = searchResults?.totalPages || 1
-
   return (
     <div className="space-y-8">
       {/* Search Header */}
@@ -82,7 +178,7 @@ const SearchResultsPage = () => {
             {query ? `Search Results for "${query}"` : 'Browse All Books'}
           </h1>
           <p className="text-gruvbox-light-fg2 dark:text-gruvbox-dark-fg2">
-            {searchResults?.total || 0} books found
+            {filteredBooks.length} books found
           </p>
         </div>
 
@@ -91,7 +187,7 @@ const SearchResultsPage = () => {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search for books, authors, or genres..."
+              placeholder="Start typing to search books, authors, or genres..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input pr-12 bg-gruvbox-light-bg0/80 dark:bg-gruvbox-dark-bg0/80 backdrop-blur-md border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 shadow-lg shadow-black/10"
@@ -103,6 +199,9 @@ const SearchResultsPage = () => {
               <Search className="h-5 w-5" />
             </button>
           </div>
+          <p className="text-center text-sm text-gruvbox-light-fg2 dark:text-gruvbox-dark-fg2 mt-2">
+            Search updates as you type • Results appear instantly
+          </p>
         </form>
       </motion.div>
 
@@ -128,7 +227,8 @@ const SearchResultsPage = () => {
                 className="w-full px-3 py-2 bg-gruvbox-light-bg0/80 dark:bg-gruvbox-dark-bg0/80 backdrop-blur-sm border border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 rounded-lg text-gruvbox-light-fg0 dark:text-gruvbox-dark-fg0 focus:outline-none focus:ring-2 focus:ring-gruvbox-light-blue dark:focus:ring-gruvbox-dark-blue focus:border-transparent"
               >
                 <option value="">All Genres</option>
-                <option value="fiction">Fiction</option>
+                <option value="fiction">Fiction (Fantasy, Romance, Adventure, etc.)</option>
+                <option value="non-fiction">Non-Fiction (All other genres)</option>
                 <option value="classic">Classic</option>
                 <option value="romance">Romance</option>
                 <option value="dystopian">Dystopian</option>
@@ -136,38 +236,13 @@ const SearchResultsPage = () => {
                 <option value="adventure">Adventure</option>
                 <option value="political">Political</option>
                 <option value="satire">Satire</option>
+                <option value="biography">Biography</option>
+                <option value="history">History</option>
+                <option value="science">Science</option>
+                <option value="technology">Technology</option>
+                <option value="philosophy">Philosophy</option>
+                <option value="religion">Religion</option>
               </select>
-            </div>
-
-            {/* Price Range Filter */}
-            <div className="space-y-3 mt-4">
-              <label className="text-sm font-medium text-gruvbox-light-fg dark:text-gruvbox-dark-fg">Price Range</label>
-              <div className="flex space-x-2">
-                <input
-                  type="number"
-                  placeholder="Min"
-                  value={filters.priceRange?.min || ''}
-                  onChange={(e) => handleFilterChange({
-                    priceRange: {
-                      min: e.target.value ? Number(e.target.value) : undefined,
-                      max: filters.priceRange?.max
-                    }
-                  })}
-                  className="w-1/2 px-3 py-2 bg-gruvbox-light-bg0/80 dark:bg-gruvbox-dark-bg0/80 backdrop-blur-sm border border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 rounded-lg text-gruvbox-light-fg0 dark:text-gruvbox-dark-fg0 focus:outline-none focus:ring-2 focus:ring-gruvbox-light-blue dark:focus:ring-gruvbox-dark-blue focus:border-transparent"
-                />
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={filters.priceRange?.max || ''}
-                  onChange={(e) => handleFilterChange({
-                    priceRange: {
-                      min: filters.priceRange?.min,
-                      max: e.target.value ? Number(e.target.value) : undefined
-                    }
-                  })}
-                  className="w-1/2 px-3 py-2 bg-gruvbox-light-bg0/80 dark:bg-gruvbox-dark-bg0/80 backdrop-blur-sm border border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 rounded-lg text-gruvbox-light-fg0 dark:text-gruvbox-dark-fg0 focus:outline-none focus:ring-2 focus:ring-gruvbox-light-blue dark:focus:ring-gruvbox-dark-blue focus:border-transparent"
-                />
-              </div>
             </div>
 
             {/* Rating Filter */}
@@ -233,13 +308,13 @@ const SearchResultsPage = () => {
                 )}
               </button>
               <button
-                onClick={() => handleSort('price')}
+                onClick={() => handleSort('author')}
                 className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors duration-200 ${
-                  sortBy === 'price' ? 'bg-gruvbox-light-blue/90 backdrop-blur-sm text-gruvbox-light-fg shadow-lg' : 'bg-gruvbox-light-bg0/60 dark:bg-gruvbox-dark-bg0/60 backdrop-blur-md text-gruvbox-light-fg hover:bg-gruvbox-light-bg0/80 dark:hover:bg-gruvbox-dark-bg0/80 border border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 shadow-lg shadow-black/10'
+                  sortBy === 'author' ? 'bg-gruvbox-light-blue/90 backdrop-blur-sm text-gruvbox-light-fg shadow-lg' : 'bg-gruvbox-light-bg0/60 dark:bg-gruvbox-dark-bg0/60 backdrop-blur-md text-gruvbox-light-fg hover:bg-gruvbox-light-bg0/80 dark:hover:bg-gruvbox-dark-bg0/80 border border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 shadow-lg shadow-black/10'
                 }`}
               >
-                <span>Price</span>
-                {sortBy === 'price' && (
+                <span>Author</span>
+                {sortBy === 'author' && (
                   sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />
                 )}
               </button>
@@ -249,10 +324,8 @@ const SearchResultsPage = () => {
                   sortBy === 'rating' ? 'bg-gruvbox-light-blue/90 backdrop-blur-sm text-gruvbox-light-fg shadow-lg' : 'bg-gruvbox-light-bg0/60 dark:bg-gruvbox-dark-bg0/60 backdrop-blur-md text-gruvbox-light-fg hover:bg-gruvbox-light-bg0/80 dark:hover:bg-gruvbox-dark-bg0/80 border border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 shadow-lg shadow-black/10'
                 }`}
               >
-                <span>Rating</span>
-                {sortBy === 'rating' && (
-                  sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />
-                )}
+                <span>Rating (Highest First)</span>
+                {sortBy === 'rating' && <SortDesc className="h-4 w-4" />}
               </button>
             </div>
 
@@ -296,7 +369,7 @@ const SearchResultsPage = () => {
                 </div>
               ))}
             </div>
-          ) : searchResults?.data.length === 0 ? (
+          ) : paginatedBooks.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -307,12 +380,12 @@ const SearchResultsPage = () => {
             </motion.div>
           ) : (
             <>
-                          <div className={`grid gap-6 ${
-              viewMode === 'grid' 
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5' 
-                : 'grid-cols-1'
-            }`}>
-                {searchResults?.data.map((book: Book, index: number) => (
+              <div className={`grid gap-6 ${
+                viewMode === 'grid' 
+                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5' 
+                  : 'grid-cols-1'
+              }`}>
+                {paginatedBooks.map((book: Book, index: number) => (
                   <BookCard key={book.id} book={book} index={index} />
                 ))}
               </div>

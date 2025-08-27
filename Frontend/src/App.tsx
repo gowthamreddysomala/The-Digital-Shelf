@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect } from 'react'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
@@ -9,8 +10,29 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import AdminPage from './pages/AdminPage'
 import { AuthProvider } from './contexts/AuthContext'
+import pingManager from './services/pingManager'
 
 function App() {
+  // Initialize ping manager when app starts
+  useEffect(() => {
+    const initializePingService = async () => {
+      try {
+        console.log('Initializing ping services for Digital Shelf...')
+        await pingManager.initialize()
+        console.log('Ping services initialized successfully')
+      } catch (error) {
+        console.error('Failed to initialize ping services:', error)
+      }
+    }
+
+    initializePingService()
+
+    // Cleanup when app unmounts
+    return () => {
+      pingManager.destroy().catch(console.error)
+    }
+  }, [])
+
   return (
     <AuthProvider>
       <div className="min-h-screen bg-gruvbox-light-bg dark:bg-gruvbox-dark-bg relative">

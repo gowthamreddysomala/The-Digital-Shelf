@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import {useQuery} from 'react-query'
 import {motion} from 'framer-motion'
 import {BookOpen, Search, Star, TrendingUp, Lock, LogIn} from 'lucide-react'
@@ -10,8 +10,18 @@ import { useAuth } from '../contexts/AuthContext'
 
 const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
   const navigate = useNavigate()
   const { isAuthenticated, isLoading: authLoading } = useAuth()
+
+  // Debounce search query for better performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery)
+    }, 300) // 300ms delay
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   // Fetch featured books (public access)
   const { data: featuredBooks, isLoading: isLoadingFeatured } = useQuery(
@@ -43,6 +53,21 @@ const HomePage = () => {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
     }
   }
+
+  // Filter books based on search query
+  const filteredFeaturedBooks = featuredBooks?.filter((book: Book) => {
+    if (!debouncedQuery) return true
+    return book.title.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+           book.author.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+           book.genre.some(g => g.toLowerCase().includes(debouncedQuery.toLowerCase()))
+  }) || []
+
+  const filteredAllBooks = allBooks?.data?.filter((book: Book) => {
+    if (!debouncedQuery) return true
+    return book.title.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+           book.author.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+           book.genre.some(g => g.toLowerCase().includes(debouncedQuery.toLowerCase()))
+  }) || []
 
   const heroVariants = {
     hidden: { opacity: 0, y: 50 },
@@ -93,7 +118,7 @@ const HomePage = () => {
               <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
-                  placeholder="Search for books, authors, or genres..."
+                  placeholder="Start typing to search books, authors, or genres..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-6 py-4 bg-gruvbox-light-bg0/40 dark:bg-gruvbox-dark-bg0/40 backdrop-blur-2xl border border-gruvbox-light-bg3/20 dark:border-gruvbox-dark-bg3/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-gruvbox-light-primary dark:focus:ring-gruvbox-dark-primary focus:border-transparent text-gruvbox-light-fg0 dark:text-gruvbox-dark-fg0 placeholder-gruvbox-light-fg3 dark:placeholder-gruvbox-dark-fg3 text-lg shadow-2xl shadow-black/20"
@@ -105,6 +130,9 @@ const HomePage = () => {
                   <Search className="h-6 w-6" />
                 </button>
               </form>
+              <p className="text-center text-sm text-gruvbox-light-fg2 dark:text-gruvbox-dark-fg2 mt-3">
+                Search updates as you type • Results appear instantly
+              </p>
             </motion.div>
 
             <motion.div variants={itemVariants} className="mt-8 flex flex-wrap justify-center gap-4">
@@ -213,10 +241,28 @@ const HomePage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {featuredBooks?.map((book: Book, index: number) => (
+              {filteredFeaturedBooks.map((book: Book, index: number) => (
                 <BookCard key={book.id} book={book} index={index} />
               ))}
             </div>
+          )}
+
+          {/* View Count Summary */}
+          {filteredFeaturedBooks && filteredFeaturedBooks.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-center"
+            >
+              <p className="text-gruvbox-light-fg2 dark:text-gruvbox-dark-fg2">
+                {debouncedQuery ? 'Filtered' : 'Featured'} books have been viewed{' '}
+                <span className="font-semibold text-gruvbox-light-primary dark:text-gruvbox-dark-primary">
+                  {filteredFeaturedBooks.reduce((total, book) => total + (book.viewCount || 0), 0)}
+                </span>{' '}
+                times
+              </p>
+            </motion.div>
           )}
         </section>
       )}
@@ -257,10 +303,28 @@ const HomePage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {allBooks?.data.map((book: Book, index: number) => (
+              {filteredAllBooks.map((book: Book, index: number) => (
                 <BookCard key={book.id} book={book} index={index} />
               ))}
             </div>
+          )}
+
+          {/* View Count Summary for All Books */}
+          {filteredAllBooks && filteredAllBooks.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-center"
+            >
+              <p className="text-gruvbox-light-fg2 dark:text-gruvbox-dark-fg2">
+                {debouncedQuery ? 'Filtered' : 'All'} books have been viewed{' '}
+                <span className="font-semibold text-gruvbox-light-primary dark:text-gruvbox-dark-primary">
+                  {filteredAllBooks.reduce((total, book) => total + (book.viewCount || 0), 0)}
+                </span>{' '}
+                times
+              </p>
+            </motion.div>
           )}
 
           <motion.div

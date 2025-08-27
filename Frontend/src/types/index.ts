@@ -15,6 +15,7 @@ export interface Book {
   inStock: boolean
   featured: boolean
   url: string
+  viewCount?: number
 }
 
 export interface SearchFilters {

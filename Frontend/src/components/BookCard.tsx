@@ -1,8 +1,9 @@
 import {Link, useNavigate} from 'react-router-dom'
 import {motion} from 'framer-motion'
-import {Eye, ShoppingCart, Star, Download} from 'lucide-react'
+import {Eye, ShoppingCart, Star, Download, EyeOff} from 'lucide-react'
 import {Book} from '../types'
 import {useAuth} from '../contexts/AuthContext'
+import {useState, useEffect} from 'react'
 
 interface BookCardProps {
   book: Book
@@ -12,6 +13,24 @@ interface BookCardProps {
 const BookCard = ({ book, index = 0 }: BookCardProps) => {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
+  const [viewCount, setViewCount] = useState(book.viewCount || 0)
+
+  // Load view count from localStorage on component mount
+  useEffect(() => {
+    const storedViews = localStorage.getItem(`book_views_${book.id}`)
+    if (storedViews) {
+      setViewCount(parseInt(storedViews))
+    }
+  }, [book.id])
+
+  const incrementViewCount = () => {
+    const newCount = viewCount + 1
+    setViewCount(newCount)
+    localStorage.setItem(`book_views_${book.id}`, newCount.toString())
+    
+    // Also update the book object for immediate UI update
+    book.viewCount = newCount
+  }
 
   const handleBookClick = (e: React.MouseEvent) => {
     if (!isAuthenticated) {
@@ -19,7 +38,8 @@ const BookCard = ({ book, index = 0 }: BookCardProps) => {
       navigate('/login')
       return
     }
-    // If authenticated, let the Link handle navigation normally
+    // Increment view count when book is clicked
+    incrementViewCount()
   }
 
   const renderStars = (rating: number) => {
@@ -156,14 +176,15 @@ const BookCard = ({ book, index = 0 }: BookCardProps) => {
             )}
           </div>
 
-          {/* Price */}
+          {/* Price and Views */}
           <div className="flex items-center justify-between pt-2">
             <span className="text-lg font-bold text-gruvbox-light-primary dark:text-gruvbox-dark-primary">
               {book.price < 1 ? 'Free' : `₹${book.price.toFixed(2)}`}
             </span>
-            <span className="text-gruvbox-light-fg2 dark:text-gruvbox-dark-fg2 text-sm">
-              {book.pageCount} pages
-            </span>
+            <div className="flex items-center space-x-1 text-gruvbox-light-fg2 dark:text-gruvbox-dark-fg2 text-sm">
+              <Eye className="h-3 w-3" />
+              <span>{viewCount} views</span>
+            </div>
           </div>
         </div>
       </Link>

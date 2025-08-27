@@ -1,7 +1,7 @@
 import {useState} from 'react'
-import {Link, useNavigate} from 'react-router-dom'
+import {Link, useNavigate, useLocation} from 'react-router-dom'
 import {motion} from 'framer-motion'
-import {BookOpen, Menu, Search, ShoppingCart, X, User, LogOut} from 'lucide-react'
+import {BookOpen, Menu, Search, ShoppingCart, X, User, LogOut, Home} from 'lucide-react'
 import ThemeToggle from './ThemeToggle'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -9,7 +9,11 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, isAuthenticated, logout } = useAuth()
+
+  // Check if we're on the home page
+  const isHomePage = location.pathname === '/'
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,29 +36,33 @@ const Header = () => {
   return (
     <header className="mx-4 mt-4 bg-gruvbox-light-bg0/30 dark:bg-gruvbox-dark-bg0/30 backdrop-blur-2xl border border-gruvbox-light-bg3/20 dark:border-gruvbox-dark-bg3/20 sticky top-4 z-50 shadow-2xl shadow-black/20 rounded-3xl">
       <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2 bg-gruvbox-light-primary/20 dark:bg-gruvbox-dark-primary/20 rounded-2xl"
+              className="p-1.5 sm:p-2 bg-gruvbox-light-primary/20 dark:bg-gruvbox-dark-primary/20 rounded-xl sm:rounded-2xl"
             >
-              <BookOpen className="h-8 w-8 text-gruvbox-light-primary dark:text-gruvbox-dark-primary" />
+              <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-gruvbox-light-primary dark:text-gruvbox-dark-primary" />
             </motion.div>
-            <span className="text-xl font-bold text-gruvbox-light-fg dark:text-gruvbox-dark-fg font-serif">
+            <span className="text-lg sm:text-xl lg:text-2xl font-bold text-gruvbox-light-fg dark:text-gruvbox-dark-fg font-serif">
               Digital Bookshelf
             </span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/" 
-              className="text-gruvbox-light-fg dark:text-gruvbox-dark-fg hover:text-gruvbox-light-primary dark:hover:text-gruvbox-dark-primary transition-colors duration-200 font-medium px-4 py-2 rounded-xl hover:bg-gruvbox-light-bg0/30 dark:hover:bg-gruvbox-dark-bg0/30"
-            >
-              Home
-            </Link>
+            {/* Home button - only show when not on home page */}
+            {!isHomePage && (
+              <Link 
+                to="/" 
+                className="text-gruvbox-light-fg dark:text-gruvbox-dark-fg hover:text-gruvbox-light-primary dark:hover:text-gruvbox-dark-primary transition-colors duration-200 font-medium px-4 py-2 rounded-xl hover:bg-gruvbox-light-bg0/30 dark:hover:bg-gruvbox-dark-bg0/30 flex items-center space-x-2"
+              >
+                <Home className="h-4 w-4" />
+                <span>Home</span>
+              </Link>
+            )}
             <Link 
               to="/search" 
               className="text-gruvbox-light-fg dark:text-gruvbox-dark-fg hover:text-gruvbox-light-primary dark:hover:text-gruvbox-dark-primary transition-colors duration-200 font-medium px-4 py-2 rounded-xl hover:bg-gruvbox-light-bg0/30 dark:hover:bg-gruvbox-dark-bg0/30"
@@ -204,13 +212,17 @@ const Header = () => {
             className="md:hidden border-t border-gruvbox-light-bg3/20 dark:border-gruvbox-dark-bg3/20 bg-gruvbox-light-bg0/30 dark:bg-gruvbox-dark-bg0/30 backdrop-blur-xl rounded-b-3xl overflow-hidden"
           >
             <nav className="py-6 space-y-2 px-4">
-              <Link 
-                to="/" 
-                className="block px-4 py-3 text-gruvbox-light-fg dark:text-gruvbox-dark-fg hover:text-gruvbox-light-primary dark:hover:text-gruvbox-dark-primary hover:bg-gruvbox-light-bg0/30 dark:hover:bg-gruvbox-dark-bg0/30 transition-colors duration-200 rounded-2xl"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Home
-              </Link>
+              {/* Home button - only show when not on home page */}
+              {!isHomePage && (
+                <Link 
+                  to="/" 
+                  className="block px-4 py-3 text-gruvbox-light-fg dark:text-gruvbox-dark-fg hover:text-gruvbox-light-primary dark:hover:text-gruvbox-dark-primary hover:bg-gruvbox-light-bg0/30 dark:hover:bg-gruvbox-dark-bg0/30 transition-colors duration-200 rounded-2xl flex items-center space-x-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Home className="h-4 w-4" />
+                  <span>Home</span>
+                </Link>
+              )}
               <Link 
                 to="/search" 
                 className="block px-4 py-3 text-gruvbox-light-fg dark:text-gruvbox-dark-fg hover:text-gruvbox-light-primary dark:hover:text-gruvbox-dark-primary hover:bg-gruvbox-light-bg0/30 dark:hover:bg-gruvbox-dark-bg0/30 transition-colors duration-200 rounded-2xl"

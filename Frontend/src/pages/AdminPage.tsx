@@ -443,13 +443,55 @@ const AdminPage = () => {
                     <label className="block text-sm font-medium text-gruvbox-light-fg dark:text-gruvbox-dark-fg mb-2">
                       Category/Genre
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="category"
                       value={formData.category}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-gruvbox-light-bg0/60 dark:bg-gruvbox-dark-bg0/60 backdrop-blur-md border border-gruvbox-light-bg3/30 dark:border-gruvbox-dark-bg3/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-gruvbox-light-primary dark:focus:ring-gruvbox-dark-primary focus:border-transparent text-gruvbox-light-fg0 dark:text-gruvbox-dark-fg0"
-                    />
+                    >
+                      <option value="">Select a genre</option>
+                      <option value="fiction">Fiction</option>
+                      <option value="fantasy">Fantasy</option>
+                      <option value="romance">Romance</option>
+                      <option value="adventure">Adventure</option>
+                      <option value="mystery">Mystery</option>
+                      <option value="thriller">Thriller</option>
+                      <option value="sci-fi">Science Fiction</option>
+                      <option value="dystopian">Dystopian</option>
+                      <option value="classic">Classic</option>
+                      <option value="satire">Satire</option>
+                      <option value="political">Political</option>
+                      <option value="biography">Biography</option>
+                      <option value="history">History</option>
+                      <option value="science">Science</option>
+                      <option value="technology">Technology</option>
+                      <option value="philosophy">Philosophy</option>
+                      <option value="religion">Religion</option>
+                      <option value="self-help">Self-Help</option>
+                      <option value="business">Business</option>
+                      <option value="economics">Economics</option>
+                      <option value="psychology">Psychology</option>
+                      <option value="sociology">Sociology</option>
+                      <option value="art">Art</option>
+                      <option value="music">Music</option>
+                      <option value="poetry">Poetry</option>
+                      <option value="drama">Drama</option>
+                      <option value="comedy">Comedy</option>
+                      <option value="horror">Horror</option>
+                      <option value="western">Western</option>
+                      <option value="war">War</option>
+                      <option value="sports">Sports</option>
+                      <option value="travel">Travel</option>
+                      <option value="cookbook">Cookbook</option>
+                      <option value="health">Health & Fitness</option>
+                      <option value="education">Education</option>
+                      <option value="reference">Reference</option>
+                      <option value="children">Children's</option>
+                      <option value="young-adult">Young Adult</option>
+                      <option value="graphic-novel">Graphic Novel</option>
+                      <option value="manga">Manga</option>
+                      <option value="comics">Comics</option>
+                    </select>
                   </div>
 
                   <div>
