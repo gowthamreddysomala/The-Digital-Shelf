@@ -3,6 +3,7 @@ package com.thedigitalshelf.books.service;
 import com.thedigitalshelf.books.entity.Books;
 import com.thedigitalshelf.books.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,6 +60,11 @@ public class BookService {
     
     public List<Books> getFeaturedBooks() {
         return bookRepository.findByFeaturedTrue();
+    }
+
+    @Transactional
+    public int incrementViews(Integer id) {
+        return bookRepository.incrementViews(id);
     }
 }
 

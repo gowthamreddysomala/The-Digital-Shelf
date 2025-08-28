@@ -1,6 +1,7 @@
 import { Book, PaginatedResponse, SearchParams } from '../types'
+import { ENDPOINTS } from '../config/endpoints'
 
-const API_BASE_URL = 'https://the-digital-shelf.onrender.com/api'
+const API_BASE_URL = ENDPOINTS.BACKEND.BASE
 const FALLBACK_IMAGE = '/fallback/book-cover.svg'
 
 // Helper function to get auth headers
@@ -64,6 +65,7 @@ export const bookService = {
         coverImage: getBookCoverImage(book.image),
         price: book.price || 0,
         rating: book.rating,
+        viewCount: book.views || 0,
         genre: book.category ? [book.category] : ['Fiction'],
         publishedDate: book.publishedDate || '',
         isbn: '',
@@ -111,6 +113,7 @@ export const bookService = {
         coverImage: getBookCoverImage(book.image),
         price: book.price || 0,
         rating: book.rating,
+        viewCount: book.views || 0,
         genre: book.category ? [book.category] : ['Fiction'],
         publishedDate: book.publishedDate || '',
         isbn: '',
@@ -154,6 +157,7 @@ export const bookService = {
         coverImage: getBookCoverImage(book.image),
         price: book.price || 0,
         rating: book.rating,
+        viewCount: book.views || 0,
         genre: book.category ? [book.category] : ['Fiction'],
         publishedDate: book.publishedDate || '',
         isbn: '',
@@ -193,6 +197,7 @@ export const bookService = {
         coverImage: getBookCoverImage(book.image),
         price: book.price || 0,
         rating: book.rating,
+        viewCount: book.views || 0,
         genre: book.category ? [book.category] : ['Fiction'],
         publishedDate: book.publishedDate || '',
         isbn: '',
@@ -206,6 +211,20 @@ export const bookService = {
     } catch (error) {
       console.error('Error searching books:', error)
       throw error
+    }
+  },
+
+  // Increment book views
+  async incrementView(id: string): Promise<void> {
+    try {
+      await fetch(`${API_BASE_URL}/books/${id}/views`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    } catch (error) {
+      console.error('Error incrementing view:', error)
     }
   },
 

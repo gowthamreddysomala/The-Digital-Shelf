@@ -1,6 +1,7 @@
 import {AuthRequest, AuthResponse} from '../types'
+import { ENDPOINTS } from '../config/endpoints'
 
-const API_BASE_URL = 'https://the-digital-shelf.onrender.com/api'
+const API_BASE_URL = ENDPOINTS.BACKEND.BASE
 
 export const authService = {
   // Login user

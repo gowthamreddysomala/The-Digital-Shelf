@@ -28,6 +28,9 @@ public class Books {
     @Column(name = "price")
     private float price;
     
+    @Column(name = "views")
+    private int views = 0;
+    
     @Column(name = "featured", nullable = false)
     private boolean featured = false;
 
@@ -148,6 +151,14 @@ public class Books {
 
     public void setFeatured(boolean featured) {
         this.featured = featured;
+    }
+
+    public int getViews() {
+        return views;
+    }
+
+    public void setViews(int views) {
+        this.views = views;
     }
 
     @Override

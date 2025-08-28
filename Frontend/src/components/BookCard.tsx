@@ -1,6 +1,6 @@
 import {Link, useNavigate} from 'react-router-dom'
 import {motion} from 'framer-motion'
-import {Eye, ShoppingCart, Star, Download} from 'lucide-react'
+import {Eye, Star} from 'lucide-react'
 import {Book} from '../types'
 import {useAuth} from '../contexts/AuthContext'
 import {useState, useEffect} from 'react'
@@ -23,13 +23,20 @@ const BookCard = ({ book, index = 0 }: BookCardProps) => {
     }
   }, [book.id])
 
-  const incrementViewCount = () => {
+  const incrementViewCount = async () => {
     const newCount = viewCount + 1
     setViewCount(newCount)
     localStorage.setItem(`book_views_${book.id}`, newCount.toString())
     
     // Also update the book object for immediate UI update
     book.viewCount = newCount
+    // Send increment to backend (best-effort)
+    try {
+      const { bookService } = await import('../services/bookService')
+      bookService.incrementView(book.id)
+    } catch (e) {
+      // ignore network errors for UX
+    }
   }
 
   const handleBookClick = (e: React.MouseEvent) => {
@@ -87,44 +94,7 @@ const BookCard = ({ book, index = 0 }: BookCardProps) => {
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          
-          {/* Quick Actions Overlay */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="flex space-x-2">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="p-2 bg-gruvbox-light-primary/90 dark:bg-gruvbox-dark-primary/90 backdrop-blur-xl rounded-full text-white hover:bg-gruvbox-light-primary dark:hover:bg-gruvbox-dark-primary transition-colors duration-200 shadow-2xl"
-                onClick={(e) => e.preventDefault()}
-              >
-                <Eye className="h-4 w-4" />
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="p-2 bg-gruvbox-light-green/90 dark:bg-gruvbox-dark-green/90 backdrop-blur-xl rounded-full text-white hover:bg-gruvbox-light-green dark:hover:bg-gruvbox-dark-green transition-colors duration-200 shadow-2xl"
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (book.url && book.url.trim() !== '') {
-                    window.open(book.url, '_blank')
-                  } else {
-                    alert('Download link not available for this book')
-                  }
-                }}
-              >
-                <Download className="h-4 w-4" />
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="p-2 bg-gruvbox-light-primary/90 dark:bg-gruvbox-dark-primary/90 backdrop-blur-xl rounded-full text-white hover:bg-gruvbox-light-primary dark:hover:bg-gruvbox-dark-primary transition-colors duration-200 shadow-2xl"
-                onClick={(e) => e.preventDefault()}
-              >
-                <ShoppingCart className="h-4 w-4" />
-              </motion.button>
-            </div>
-          </div>
+          {/* Removed hover quick action icons */}
 
           {/* Stock Status */}
           {!book.inStock && (

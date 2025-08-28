@@ -2,6 +2,7 @@ package com.thedigitalshelf.books.repository;
 
 import com.thedigitalshelf.books.entity.Books;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,6 +26,10 @@ public interface BookRepository extends JpaRepository<Books, Integer> {
     Double getAverageRating();
     
     List<Books> findByFeaturedTrue();
+
+    @Modifying
+    @Query("UPDATE Books b SET b.views = b.views + 1 WHERE b.id = :id")
+    int incrementViews(@Param("id") Integer id);
 }
 
 

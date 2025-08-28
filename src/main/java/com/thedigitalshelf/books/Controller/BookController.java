@@ -5,6 +5,7 @@ import com.thedigitalshelf.books.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -155,6 +156,17 @@ public class BookController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/views")
+    @Transactional
+    public ResponseEntity<?> incrementViews(@PathVariable Integer id) {
+        Optional<Books> existingBook = bookService.getBookById(id);
+        if (existingBook.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        int updated = bookService.incrementViews(id);
+        return ResponseEntity.ok().body("views+=" + updated);
     }
 }
 

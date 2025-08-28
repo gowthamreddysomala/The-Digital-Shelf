@@ -11,6 +11,7 @@ import RegisterPage from './pages/RegisterPage'
 import AdminPage from './pages/AdminPage'
 import { AuthProvider } from './contexts/AuthContext'
 import pingManager from './services/pingManager'
+import BackendWakeOverlay from './components/BackendWakeOverlay'
 
 function App() {
   // Initialize ping manager when app starts
@@ -35,6 +36,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <BackendWakeOverlay />
       <div className="min-h-screen bg-gruvbox-light-bg dark:bg-gruvbox-dark-bg relative">
         {/* Subtle background pattern */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,241,199,0.1),transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(40,40,40,0.1),transparent_50%)] pointer-events-none" />
