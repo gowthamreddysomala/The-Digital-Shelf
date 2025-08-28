@@ -83,7 +83,7 @@ class PingService {
     
     for (const url of this.FRONTEND_PING_URLS) {
       try {
-        const response = await fetch(url, {
+        await fetch(url, {
           method: 'GET',
           mode: 'no-cors', // Avoid CORS issues
           cache: 'no-cache',
@@ -92,8 +92,7 @@ class PingService {
             'X-Service': 'frontend-ping',
             'User-Agent': 'DigitalShelf-PingService/1.0'
           }
-        })
-        
+        });
         console.log(`Frontend ping successful to ${url}`)
         break // Exit loop if successful
       } catch (error) {
@@ -145,15 +144,6 @@ class PingService {
       }
     }
   }
-
-  /**
-   * Send a ping request to keep the service alive
-   */
-  private async sendPing(): Promise<void> {
-    // This method is kept for backward compatibility
-    await this.sendComprehensivePing()
-  }
-
   /**
    * Add visibility change listeners to optimize pinging
    */

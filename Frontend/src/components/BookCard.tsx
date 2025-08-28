@@ -1,6 +1,6 @@
 import {Link, useNavigate} from 'react-router-dom'
 import {motion} from 'framer-motion'
-import {Eye, ShoppingCart, Star, Download, EyeOff} from 'lucide-react'
+import {Eye, ShoppingCart, Star, Download} from 'lucide-react'
 import {Book} from '../types'
 import {useAuth} from '../contexts/AuthContext'
 import {useState, useEffect} from 'react'

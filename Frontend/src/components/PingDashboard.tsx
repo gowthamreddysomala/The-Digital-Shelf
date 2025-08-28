@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Activity, Server, Globe, Wifi, WifiOff, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
+import { Activity, Server, Globe, Wifi, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
 import pingManager from '../services/pingManager'
-import { ENDPOINTS, HEALTH_CHECK } from '../config/endpoints'
+import { ENDPOINTS } from '../config/endpoints'
 
 interface PingStatus {
   isInitialized: boolean

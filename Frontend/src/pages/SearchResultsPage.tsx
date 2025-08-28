@@ -1,4 +1,4 @@
-import {useEffect, useState, useCallback} from 'react'
+import {useEffect, useState} from 'react'
 import {useQuery} from 'react-query'
 import {useSearchParams} from 'react-router-dom'
 import {motion} from 'framer-motion'

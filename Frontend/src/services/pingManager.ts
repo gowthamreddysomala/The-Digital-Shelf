@@ -46,7 +46,7 @@ class PingManager {
       console.log('Ping Manager initialized successfully')
     } catch (error) {
       console.error('Ping Manager initialization failed:', error)
-      
+
       // Ensure main thread service is running as fallback
       if (this.fallbackToMainThread) {
         console.log('Starting main thread ping service as fallback...')
@@ -68,11 +68,11 @@ class PingManager {
       if (this.useServiceWorker) {
         await serviceWorkerRegistration.startPing()
       }
-      
+
       if (this.fallbackToMainThread) {
         pingService.start()
       }
-      
+
       console.log('All ping services started')
     } catch (error) {
       console.error('Failed to start ping services:', error)
@@ -87,11 +87,11 @@ class PingManager {
       if (this.useServiceWorker) {
         await serviceWorkerRegistration.stopPing()
       }
-      
+
       if (this.fallbackToMainThread) {
         pingService.stop()
       }
-      
+
       console.log('All ping services stopped')
     } catch (error) {
       console.error('Failed to stop ping services:', error)
@@ -106,11 +106,11 @@ class PingManager {
       if (this.useServiceWorker) {
         await serviceWorkerRegistration.forcePing()
       }
-      
+
       if (this.fallbackToMainThread) {
         pingService.forcePing()
       }
-      
+
       console.log('Force ping executed on all services')
     } catch (error) {
       console.error('Failed to execute force ping:', error)
@@ -135,30 +135,40 @@ class PingManager {
       primaryMethod: 'service-worker' | 'main-thread' | 'both'
     }
   }> {
-    const status = {
+    const status: {
+      isInitialized: boolean
+      serviceWorker: { isActive: boolean; isReady: boolean; lastPing?: string }
+      mainThread: { isActive: boolean }
+      overall: { isActive: boolean; primaryMethod: 'service-worker' | 'main-thread' | 'both' }
+    } = {
       isInitialized: this.isInitialized,
       serviceWorker: {
         isActive: false,
         isReady: false,
-        lastPing: undefined
+        lastPing: undefined as string | undefined
       },
       mainThread: {
         isActive: false
       },
       overall: {
         isActive: false,
-        primaryMethod: 'main-thread' as const
+        primaryMethod: 'main-thread'
       }
     }
 
     try {
       // Get service worker status
       if (this.useServiceWorker) {
-        const swStatus = await serviceWorkerRegistration.getStatus()
-        status.serviceWorker = {
-          isActive: swStatus.isActive,
-          isReady: serviceWorkerRegistration.isReady(),
-          lastPing: swStatus.lastPing
+        try {
+          const swStatus = await serviceWorkerRegistration.getStatus()
+          status.serviceWorker = {
+            isActive: swStatus.isActive,
+            isReady: serviceWorkerRegistration.isReady(),
+            lastPing: swStatus.lastPing
+          }
+        } catch (swError) {
+          console.warn('Could not get Service Worker status:', swError);
+          // Keep default inactive status for service worker
         }
       }
 
@@ -173,9 +183,9 @@ class PingManager {
       // Determine overall status
       const swActive = status.serviceWorker.isActive
       const mainActive = status.mainThread.isActive
-      
+
       status.overall.isActive = swActive || mainActive
-      
+
       if (swActive && mainActive) {
         status.overall.primaryMethod = 'both'
       } else if (swActive) {
@@ -201,11 +211,11 @@ class PingManager {
     if (options.useServiceWorker !== undefined) {
       this.useServiceWorker = options.useServiceWorker
     }
-    
+
     if (options.fallbackToMainThread !== undefined) {
       this.fallbackToMainThread = options.fallbackToMainThread
     }
-    
+
     console.log('Ping Manager configured:', {
       useServiceWorker: this.useServiceWorker,
       fallbackToMainThread: this.fallbackToMainThread
@@ -218,11 +228,11 @@ class PingManager {
   async destroy(): Promise<void> {
     try {
       await this.stop()
-      
+
       if (this.useServiceWorker) {
         await serviceWorkerRegistration.unregister()
       }
-      
+
       this.isInitialized = false
       console.log('Ping Manager destroyed')
     } catch (error) {
