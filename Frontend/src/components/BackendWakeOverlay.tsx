@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+  import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ENDPOINTS, HEALTH_CHECK } from '../config/endpoints'
 import { Github, Heart, BookOpen, Activity, Globe, Server, Wifi } from 'lucide-react'
@@ -31,7 +31,7 @@ const tryHealthEndpoints = async (endpoints: string[], attempts: number, timeout
 
 const BackendWakeOverlay = () => {
   const [isReady, setIsReady] = useState(false)
-  const [message, setMessage] = useState('Waking up the backend, please wait...')
+  const [message, setMessage] = useState('Waking up the backend, please wait 2-3 Minutes.')
   const [pingStatus, setPingStatus] = useState<{
     isInitialized: boolean
     serviceWorker: { isActive: boolean; isReady: boolean; lastPing?: string }
