@@ -23,7 +23,7 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
-    @GetMapping("keepalive")
+    @GetMapping("/keepalive")
     public String keepalive(){
         List<Books> books = bookService.getAllBooks();
         return "Fetched";
