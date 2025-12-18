@@ -17,13 +17,17 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
-
     @GetMapping
     public ResponseEntity<List<Books>> getAllBooks() {
         List<Books> books = bookService.getAllBooks();
         return ResponseEntity.ok(books);
     }
 
+    @GetMapping("keepalive")
+    public String keepalive(){
+        List<Books> books = bookService.getAllBooks();
+        return "Fetched";
+    }
     @GetMapping("/{id}")
     public ResponseEntity<Books> getBookById(@PathVariable Integer id) {
         Optional<Books> book = bookService.getBookById(id);
